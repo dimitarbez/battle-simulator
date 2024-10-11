@@ -192,6 +192,19 @@ function App() {
     };
 
     setSoldiers((prevSoldiers) => [...prevSoldiers, newSoldier]);
+
+    // Update alive count immediately for the respective army
+    if (currentArmy === 'army1') {
+      setArmy1Stats((prevStats) => ({
+        ...prevStats,
+        aliveCount: prevStats.aliveCount + 1,
+      }));
+    } else {
+      setArmy2Stats((prevStats) => ({
+        ...prevStats,
+        aliveCount: prevStats.aliveCount + 1,
+      }));
+    }
   };
 
   const startSimulation = () => {
@@ -589,7 +602,7 @@ function App() {
         </div>
 
         {/* Messages */}
-        <div className="mb-4">
+        {/* <div className="mb-4">
           <h2 className="text-2xl font-semibold mb-2 text-white">Messages</h2>
           <div className="max-h-32 md:max-h-48 overflow-y-auto border border-gray-700 p-2 bg-gray-700 text-white rounded">
             {messages.map((msg, index) => (
@@ -598,7 +611,8 @@ function App() {
               </p>
             ))}
           </div>
-        </div>
+        </div> */}
+        
         <div className="army-stats grid grid-cols-1 md:grid-cols-2 gap-6">
           {/* Army 1 Stats */}
           <div>
