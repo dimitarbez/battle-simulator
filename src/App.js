@@ -11,7 +11,7 @@ function App() {
     speed: 1.0,
     morale: 100,
     aliveCount: 0,
-    kills: 0,
+    kills: 0
   });
 
   const [army2Stats, setArmy2Stats] = useState({
@@ -20,7 +20,7 @@ function App() {
     speed: 1.0,
     morale: 100,
     aliveCount: 0,
-    kills: 0,
+    kills: 0
   });
 
   const [soldiers, setSoldiers] = useState([]);
@@ -154,7 +154,7 @@ function App() {
       color: currentArmy === 'army1' ? 'blue-500' : 'red-500',
       alive: true,
       state: 'idle',
-      radius: 10,
+      radius: 10
     };
 
     setSoldiers((prevSoldiers) => [...prevSoldiers, newSoldier]);
@@ -162,9 +162,7 @@ function App() {
 
   const startSimulation = () => {
     if (soldiers.length === 0) {
-      alert(
-        'Please place soldiers on the battlefield before starting the simulation.'
-      );
+      alert('Please place soldiers on the battlefield before starting the simulation.');
       return;
     }
 
@@ -176,12 +174,12 @@ function App() {
     setArmy1Stats((prev) => ({
       ...prev,
       aliveCount: soldiers.filter((s) => s.team === 'army1').length,
-      kills: 0,
+      kills: 0
     }));
     setArmy2Stats((prev) => ({
       ...prev,
       aliveCount: soldiers.filter((s) => s.team === 'army2').length,
-      kills: 0,
+      kills: 0
     }));
 
     // Helper function to apply random variance within ±5%
@@ -205,7 +203,7 @@ function App() {
         maxMorale: armyStats.morale,
         alive: true,
         state: 'idle',
-        lastAttack: null,
+        lastAttack: null
       };
     });
 
@@ -224,12 +222,12 @@ function App() {
     setArmy1Stats((prev) => ({
       ...prev,
       aliveCount: 0,
-      kills: 0,
+      kills: 0
     }));
     setArmy2Stats((prev) => ({
       ...prev,
       aliveCount: 0,
-      kills: 0,
+      kills: 0
     }));
   };
 
@@ -247,13 +245,9 @@ function App() {
         // Skip action for soldiers who are celebrating
         if (soldier.state === 'celebrating') return soldier;
 
-        const enemies = soldiers.filter(
-          (s) => s.team !== soldier.team && s.alive
-        );
+        const enemies = soldiers.filter((s) => s.team !== soldier.team && s.alive);
 
-        const allies = soldiers.filter(
-          (s) => s.team === soldier.team && s.alive && s.id !== soldier.id
-        );
+        const allies = soldiers.filter((s) => s.team === soldier.team && s.alive && s.id !== soldier.id);
 
         // Check for battle end
         const activeEnemies = enemies.filter((s) => s.alive);
@@ -261,10 +255,7 @@ function App() {
         // Game ends only when all enemies are dead
         if (activeEnemies.length === 0 && !winner) {
           setWinner(soldier.team);
-          setMessages((msgs) => [
-            ...msgs,
-            `${soldier.team} wins! Celebrating...`,
-          ]);
+          setMessages((msgs) => [...msgs, `${soldier.team} wins! Celebrating...`]);
 
           battleEnded = true;
           winningTeam = soldier.team;
@@ -273,10 +264,7 @@ function App() {
           setCelebrationTimer(
             setTimeout(() => {
               setBattleStarted(false);
-              setMessages((msgs) => [
-                ...msgs,
-                `Game over. ${soldier.team} wins!`,
-              ]);
+              setMessages((msgs) => [...msgs, `Game over. ${soldier.team} wins!`]);
             }, 5000)
           );
 
@@ -293,21 +281,18 @@ function App() {
           // Remove soldier if they leave the battlefield bounds
           if (soldier.x < 0 || soldier.x > battlefieldWidth) {
             soldier.alive = false;
-            setMessages((msgs) => [
-              ...msgs,
-              `${soldier.id} has left the battlefield!`,
-            ]);
+            setMessages((msgs) => [...msgs, `${soldier.id} has left the battlefield!`]);
 
             // Decrease alive count
             if (soldier.team === 'army1') {
               setArmy1Stats((prev) => ({
                 ...prev,
-                aliveCount: prev.aliveCount - 1,
+                aliveCount: prev.aliveCount - 1
               }));
             } else {
               setArmy2Stats((prev) => ({
                 ...prev,
-                aliveCount: prev.aliveCount - 1,
+                aliveCount: prev.aliveCount - 1
               }));
             }
           }
@@ -333,9 +318,7 @@ function App() {
             let moveY = (dy / distance) * soldier.speed;
 
             // Collision avoidance with all other soldiers
-            const otherSoldiers = soldiers.filter(
-              (s) => s.id !== soldier.id && s.alive
-            );
+            const otherSoldiers = soldiers.filter((s) => s.id !== soldier.id && s.alive);
             const collisions = detectCollisions(soldier, otherSoldiers);
 
             if (collisions.length > 0) {
@@ -362,21 +345,18 @@ function App() {
               if (target.health <= 0) {
                 target.alive = false;
                 target.state = 'dead';
-                setMessages((msgs) => [
-                  ...msgs,
-                  `${target.id} has been defeated by ${soldier.id}!`,
-                ]);
+                setMessages((msgs) => [...msgs, `${target.id} has been defeated by ${soldier.id}!`]);
 
                 // Increase kills for the soldier's team
                 if (soldier.team === 'army1') {
                   setArmy1Stats((prev) => ({
                     ...prev,
-                    kills: prev.kills + 1,
+                    kills: prev.kills + 1
                   }));
                 } else {
                   setArmy2Stats((prev) => ({
                     ...prev,
-                    kills: prev.kills + 1,
+                    kills: prev.kills + 1
                   }));
                 }
 
@@ -384,18 +364,17 @@ function App() {
                 if (target.team === 'army1') {
                   setArmy1Stats((prev) => ({
                     ...prev,
-                    aliveCount: prev.aliveCount - 1,
+                    aliveCount: prev.aliveCount - 1
                   }));
                 } else {
                   setArmy2Stats((prev) => ({
                     ...prev,
-                    aliveCount: prev.aliveCount - 1,
+                    aliveCount: prev.aliveCount - 1
                   }));
                 }
 
                 // Mark that a soldier from target's team has died
-                defeatedTeams[target.team] =
-                  (defeatedTeams[target.team] || 0) + 1;
+                defeatedTeams[target.team] = (defeatedTeams[target.team] || 0) + 1;
               }
             }
           }
@@ -417,17 +396,13 @@ function App() {
 
       // After mapping, decrease morale of soldiers in teams that had soldiers die
       Object.keys(defeatedTeams).forEach((team) => {
-        const moraleDecrease =
-          (10 * Math.pow(defeatedTeams[team], 4)) / (soldiers.length / 10); // Adjust as needed
+        const moraleDecrease = (10 * Math.pow(defeatedTeams[team], 4)) / (soldiers.length / 10); // Adjust as needed
         updatedSoldiers = updatedSoldiers.map((s) => {
           if (s.team === team && s.alive && s.state !== 'retreating') {
             s.morale -= moraleDecrease;
             if (s.morale <= 0 && s.state !== 'retreating') {
               s.state = 'retreating';
-              setMessages((msgs) => [
-                ...msgs,
-                `${s.id} is retreating due to low morale!`,
-              ]);
+              setMessages((msgs) => [...msgs, `${s.id} is retreating due to low morale!`]);
             }
           }
           return s;
@@ -480,7 +455,7 @@ function App() {
 
   return (
     <div
-      className="flex flex-col min-h-screen bg-gray-900"
+      className="flex flex-col min-h-screen bg-gray-900 prevent-select"
       onClick={() => {
         if (showHint) setShowHint(false);
       }}
@@ -497,20 +472,15 @@ function App() {
         <div
           className="relative battlefield bg-cover bg-center h-full rounded-lg shadow-lg"
           style={{
-            backgroundImage:
-              "url('https://i.pinimg.com/originals/7c/ca/0a/7cca0a0f83174b9e3ccaf43ec09558cc.jpg')",
+            backgroundImage: "url('https://i.pinimg.com/originals/7c/ca/0a/7cca0a0f83174b9e3ccaf43ec09558cc.jpg')"
           }}
         >
           {/* Hint Overlay */}
           {showHint && !battleStarted && (
             <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 z-10">
               <div className="text-center">
-                <h2 className="text-3xl font-bold text-white mb-4 animate-pulse">
-                  Click and drag to place soldiers
-                </h2>
-                <p className="text-lg text-gray-200">
-                  Select an army below and draw formations on the battlefield
-                </p>
+                <h2 className="text-3xl font-bold text-white mb-4 animate-pulse">Click and drag to place soldiers</h2>
+                <p className="text-lg text-gray-200">Select an army below and draw formations on the battlefield</p>
               </div>
             </div>
           )}
@@ -522,9 +492,7 @@ function App() {
               <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
               <div>
                 <p className="text-blue-300 font-semibold text-sm">Army 1</p>
-                <p className="text-xs text-white">
-                  Alive Soldiers: {army1Stats.aliveCount}
-                </p>
+                <p className="text-xs text-white">Alive Soldiers: {army1Stats.aliveCount}</p>
                 <p className="text-xs text-white">Kills: {army1Stats.kills}</p>
               </div>
             </div>
@@ -533,9 +501,7 @@ function App() {
               <div className="w-3 h-3 bg-red-500 rounded-full"></div>
               <div>
                 <p className="text-red-300 font-semibold text-sm">Army 2</p>
-                <p className="text-xs text-white">
-                  Alive Soldiers: {army2Stats.aliveCount}
-                </p>
+                <p className="text-xs text-white">Alive Soldiers: {army2Stats.aliveCount}</p>
                 <p className="text-xs text-white">Kills: {army2Stats.kills}</p>
               </div>
             </div>
@@ -546,15 +512,46 @@ function App() {
           ))}
           {winner && (
             <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-75 z-30">
-              <h1 className="text-5xl font-bold text-white">
-                {winner.toUpperCase()} WINS!
-              </h1>
+              <h1 className="text-5xl font-bold text-white">{winner.toUpperCase()} WINS!</h1>
             </div>
           )}
         </div>
       </div>
+
       {/* Controls */}
       <div className="w-full p-4 bg-gray-800">
+        {/* Army Selection Buttons */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 mt-6 mb-10">
+          <button
+            onClick={() => setCurrentArmy('army1')}
+            className={`px-6 py-3 rounded font-semibold transition ${
+              currentArmy === 'army1' ? 'bg-blue-600 text-white' : 'bg-gray-600 text-white hover:bg-blue-500'
+            }`}
+          >
+            Select Army 1
+          </button>
+          <button
+            onClick={() => setCurrentArmy('army2')}
+            className={`px-6 py-3 rounded font-semibold transition ${
+              currentArmy === 'army2' ? 'bg-red-600 text-white' : 'bg-gray-600 text-white hover:bg-red-500'
+            }`}
+          >
+            Select Army 2
+          </button>
+          <button
+            onClick={startSimulation}
+            className="bg-green-600 text-white px-6 py-3 rounded hover:bg-green-700 transition font-semibold"
+          >
+            Start Simulation
+          </button>
+          <button
+            onClick={resetSimulation}
+            className="bg-red-600 text-white px-6 py-3 rounded hover:bg-red-700 transition font-semibold"
+          >
+            Reset
+          </button>
+        </div>
+
         {/* Messages */}
         <div className="mb-4">
           <h2 className="text-2xl font-semibold mb-2 text-white">Messages</h2>
@@ -569,24 +566,20 @@ function App() {
         <div className="army-stats grid grid-cols-1 md:grid-cols-2 gap-6">
           {/* Army 1 Stats */}
           <div>
-            <h2 className="text-2xl font-semibold mb-2 text-blue-400">
-              Army 1 Stats
-            </h2>
+            <h2 className="text-2xl font-semibold mb-2 text-blue-400">Army 1 Stats</h2>
             <div className="grid grid-cols-1 gap-4">
               {Object.keys(army1Stats)
                 .filter((stat) => !['aliveCount', 'kills'].includes(stat))
                 .map((stat) => (
                   <label key={stat} className="block">
-                    <span className="text-gray-300 capitalize text-sm">
-                      {stat}:
-                    </span>
+                    <span className="text-gray-300 capitalize text-sm">{stat}:</span>
                     <input
                       type="number"
                       value={army1Stats[stat]}
                       onChange={(e) =>
                         setArmy1Stats({
                           ...army1Stats,
-                          [stat]: parseFloat(e.target.value),
+                          [stat]: parseFloat(e.target.value)
                         })
                       }
                       className="w-full mt-1 p-2 border rounded text-sm bg-gray-700 border-gray-600 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -599,24 +592,20 @@ function App() {
           </div>
           {/* Army 2 Stats */}
           <div>
-            <h2 className="text-2xl font-semibold mb-2 text-red-400">
-              Army 2 Stats
-            </h2>
+            <h2 className="text-2xl font-semibold mb-2 text-red-400">Army 2 Stats</h2>
             <div className="grid grid-cols-1 gap-4">
               {Object.keys(army2Stats)
                 .filter((stat) => !['aliveCount', 'kills'].includes(stat))
                 .map((stat) => (
                   <label key={stat} className="block">
-                    <span className="text-gray-300 capitalize text-sm">
-                      {stat}:
-                    </span>
+                    <span className="text-gray-300 capitalize text-sm">{stat}:</span>
                     <input
                       type="number"
                       value={army2Stats[stat]}
                       onChange={(e) =>
                         setArmy2Stats({
                           ...army2Stats,
-                          [stat]: parseFloat(e.target.value),
+                          [stat]: parseFloat(e.target.value)
                         })
                       }
                       className="w-full mt-1 p-2 border rounded text-sm bg-gray-700 border-gray-600 text-white focus:outline-none focus:ring-2 focus:ring-red-500"
@@ -627,44 +616,6 @@ function App() {
                 ))}
             </div>
           </div>
-        </div>
-        {/* Army Selection Buttons */}
-        <div className="flex flex-col md:flex-row justify-center mt-6 space-y-2 md:space-y-0 md:space-x-4">
-          <button
-            onClick={() => setCurrentArmy('army1')}
-            className={`px-4 py-2 rounded w-full md:w-auto font-semibold transition ${
-              currentArmy === 'army1'
-                ? 'bg-blue-600 text-white'
-                : 'bg-gray-600 text-white hover:bg-blue-500'
-            }`}
-          >
-            Select Army 1
-          </button>
-          <button
-            onClick={() => setCurrentArmy('army2')}
-            className={`px-4 py-2 rounded w-full md:w-auto font-semibold transition ${
-              currentArmy === 'army2'
-                ? 'bg-red-600 text-white'
-                : 'bg-gray-600 text-white hover:bg-red-500'
-            }`}
-          >
-            Select Army 2
-          </button>
-        </div>
-        {/* Control Buttons */}
-        <div className="flex flex-col md:flex-row justify-center mt-6 space-y-2 md:space-y-0 md:space-x-4">
-          <button
-            onClick={startSimulation}
-            className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 transition w-full md:w-auto font-semibold"
-          >
-            Start Simulation
-          </button>
-          <button
-            onClick={resetSimulation}
-            className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 transition w-full md:w-auto font-semibold"
-          >
-            Reset
-          </button>
         </div>
       </div>
     </div>
