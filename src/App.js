@@ -6,22 +6,20 @@ import './index.css';
 
 function App() {
   const [army1Stats, setArmy1Stats] = useState({
-    count: 10,
     health: 100,
     damage: 10,
     speed: 1.0,
     morale: 100,
-    aliveCount: 10,
+    aliveCount: 0,
     kills: 0,
   });
 
   const [army2Stats, setArmy2Stats] = useState({
-    count: 10,
     health: 100,
     damage: 10,
     speed: 1.0,
     morale: 100,
-    aliveCount: 10,
+    aliveCount: 0,
     kills: 0,
   });
 
@@ -30,6 +28,19 @@ function App() {
   const [winner, setWinner] = useState(null);
   const [messages, setMessages] = useState([]);
   const [celebrationTimer, setCelebrationTimer] = useState(null);
+
+  // State to track the current army being placed
+  const [currentArmy, setCurrentArmy] = useState('army1');
+
+  // New states for drawing soldiers by dragging
+  const [isDrawing, setIsDrawing] = useState(false);
+  const [lastSoldierPosition, setLastSoldierPosition] = useState(null);
+
+  // Minimum distance between soldiers when drawing
+  const MIN_DISTANCE = 20; // Adjust this value as needed
+
+  // Hint overlay state
+  const [showHint, setShowHint] = useState(true);
 
   // References and dimensions
   const battlefieldRef = useRef(null);
@@ -50,22 +61,128 @@ function App() {
     // Update dimensions on window resize
     window.addEventListener('resize', updateDimensions);
 
+    // Hide the hint after 7 seconds
+    const hintTimer = setTimeout(() => {
+      setShowHint(false);
+    }, 7000); // 7 seconds
+
     return () => {
       window.removeEventListener('resize', updateDimensions);
+      clearTimeout(hintTimer);
     };
   }, []);
 
+  // Handle mouse down event to start drawing
+  const handleMouseDown = (e) => {
+    if (battleStarted) return; // Don't handle during battle
+    setIsDrawing(true);
+
+    // Hide the hint when the user starts interacting
+    if (showHint) setShowHint(false);
+
+    const rect = battlefieldRef.current.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+
+    handleBattlefieldClick(x, y); // Place a soldier at the starting point
+
+    // Update lastSoldierPosition
+    setLastSoldierPosition({ x, y });
+  };
+
+  // Handle mouse up event to stop drawing
+  const handleMouseUp = () => {
+    setIsDrawing(false);
+    setLastSoldierPosition(null);
+  };
+
+  // Handle mouse move event to draw soldiers along the path
+  const handleMouseMove = (e) => {
+    if (!isDrawing) return;
+    const rect = battlefieldRef.current.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+
+    if (lastSoldierPosition) {
+      const dx = x - lastSoldierPosition.x;
+      const dy = y - lastSoldierPosition.y;
+      const distance = Math.hypot(dx, dy);
+      if (distance < MIN_DISTANCE) {
+        // Too close to last soldier, don't add a new one
+        return;
+      }
+    }
+
+    // Add a new soldier at this position
+    handleBattlefieldClick(x, y);
+
+    // Update lastSoldierPosition
+    setLastSoldierPosition({ x, y });
+  };
+
+  // Handle mouse leaving the battlefield while drawing
+  const handleMouseLeave = () => {
+    if (isDrawing) {
+      setIsDrawing(false);
+      setLastSoldierPosition(null);
+    }
+  };
+
+  // Function to handle adding soldiers at specific coordinates
+  const handleBattlefieldClick = (x, y) => {
+    if (battleStarted) return; // Don't handle clicks during battle
+
+    // Ensure the soldier is within battlefield bounds
+    if (x < 0 || y < 0 || x > battlefieldWidth || y > battlefieldHeight) {
+      return;
+    }
+
+    // Get the stats for the currentArmy
+    const armyStats = currentArmy === 'army1' ? army1Stats : army2Stats;
+
+    const newSoldier = {
+      id: `${currentArmy}-${Date.now()}`, // Use timestamp to ensure unique id
+      x,
+      y,
+      health: armyStats.health,
+      maxHealth: armyStats.health,
+      damage: armyStats.damage,
+      speed: armyStats.speed,
+      morale: armyStats.morale,
+      maxMorale: armyStats.morale,
+      team: currentArmy,
+      color: currentArmy === 'army1' ? 'blue-500' : 'red-500',
+      alive: true,
+      state: 'idle',
+      radius: 10,
+    };
+
+    setSoldiers((prevSoldiers) => [...prevSoldiers, newSoldier]);
+  };
+
   const startSimulation = () => {
-    setSoldiers([]);
+    if (soldiers.length === 0) {
+      alert(
+        'Please place soldiers on the battlefield before starting the simulation.'
+      );
+      return;
+    }
+
     setWinner(null);
     setMessages([]);
     setCelebrationTimer(null);
 
     // Reset alive counts and kills
-    setArmy1Stats((prev) => ({ ...prev, aliveCount: prev.count, kills: 0 }));
-    setArmy2Stats((prev) => ({ ...prev, aliveCount: prev.count, kills: 0 }));
-
-    const newSoldiers = [];
+    setArmy1Stats((prev) => ({
+      ...prev,
+      aliveCount: soldiers.filter((s) => s.team === 'army1').length,
+      kills: 0,
+    }));
+    setArmy2Stats((prev) => ({
+      ...prev,
+      aliveCount: soldiers.filter((s) => s.team === 'army2').length,
+      kills: 0,
+    }));
 
     // Helper function to apply random variance within ±5%
     const applyVariance = (value) => {
@@ -75,57 +192,24 @@ function App() {
       return Math.random() * (max - min) + min;
     };
 
-    // Calculate positions relative to battlefield dimensions
-    const leftEdge = battlefieldWidth * 0.05;
-    const rightEdge = battlefieldWidth * 0.95;
-    const topEdge = battlefieldHeight * 0.1;
-    const bottomEdge = battlefieldHeight * 0.9;
-
-    // Create Army 1 soldiers with stat variance
-    for (let i = 0; i < army1Stats.count; i++) {
-      let x = Math.random() * (battlefieldWidth * 0.1) + leftEdge;
-      let y = Math.random() * (bottomEdge - topEdge) + topEdge;
-      newSoldiers.push({
-        id: `army1-${i}`,
-        x,
-        y,
-        health: army1Stats.health,
-        maxHealth: army1Stats.health,
-        damage: applyVariance(army1Stats.damage),
-        speed: applyVariance(army1Stats.speed),
-        morale: army1Stats.morale,
-        maxMorale: army1Stats.morale,
-        team: 'army1',
-        color: 'blue-500',
+    // Update soldiers' stats according to their army stats
+    const updatedSoldiers = soldiers.map((soldier) => {
+      const armyStats = soldier.team === 'army1' ? army1Stats : army2Stats;
+      return {
+        ...soldier,
+        health: armyStats.health,
+        maxHealth: armyStats.health,
+        damage: applyVariance(armyStats.damage),
+        speed: applyVariance(armyStats.speed),
+        morale: armyStats.morale,
+        maxMorale: armyStats.morale,
         alive: true,
         state: 'idle',
-        radius: 10,
-      });
-    }
+        lastAttack: null,
+      };
+    });
 
-    // Create Army 2 soldiers with stat variance
-    for (let i = 0; i < army2Stats.count; i++) {
-      let x = rightEdge - Math.random() * (battlefieldWidth * 0.1);
-      let y = Math.random() * (bottomEdge - topEdge) + topEdge;
-      newSoldiers.push({
-        id: `army2-${i}`,
-        x,
-        y,
-        health: army2Stats.health,
-        maxHealth: army2Stats.health,
-        damage: applyVariance(army2Stats.damage),
-        speed: applyVariance(army2Stats.speed),
-        morale: army2Stats.morale,
-        maxMorale: army2Stats.morale,
-        team: 'army2',
-        color: 'red-500',
-        alive: true,
-        state: 'idle',
-        radius: 10,
-      });
-    }
-
-    setSoldiers(newSoldiers);
+    setSoldiers(updatedSoldiers);
     setBattleStarted(true);
   };
 
@@ -137,8 +221,16 @@ function App() {
     setCelebrationTimer(null);
 
     // Reset alive counts and kills
-    setArmy1Stats((prev) => ({ ...prev, aliveCount: prev.count, kills: 0 }));
-    setArmy2Stats((prev) => ({ ...prev, aliveCount: prev.count, kills: 0 }));
+    setArmy1Stats((prev) => ({
+      ...prev,
+      aliveCount: 0,
+      kills: 0,
+    }));
+    setArmy2Stats((prev) => ({
+      ...prev,
+      aliveCount: 0,
+      kills: 0,
+    }));
   };
 
   useEffect(() => {
@@ -169,7 +261,10 @@ function App() {
         // Game ends only when all enemies are dead
         if (activeEnemies.length === 0 && !winner) {
           setWinner(soldier.team);
-          setMessages((msgs) => [...msgs, `${soldier.team} wins! Celebrating...`]);
+          setMessages((msgs) => [
+            ...msgs,
+            `${soldier.team} wins! Celebrating...`,
+          ]);
 
           battleEnded = true;
           winningTeam = soldier.team;
@@ -274,9 +369,15 @@ function App() {
 
                 // Increase kills for the soldier's team
                 if (soldier.team === 'army1') {
-                  setArmy1Stats((prev) => ({ ...prev, kills: prev.kills + 1 }));
+                  setArmy1Stats((prev) => ({
+                    ...prev,
+                    kills: prev.kills + 1,
+                  }));
                 } else {
-                  setArmy2Stats((prev) => ({ ...prev, kills: prev.kills + 1 }));
+                  setArmy2Stats((prev) => ({
+                    ...prev,
+                    kills: prev.kills + 1,
+                  }));
                 }
 
                 // Decrease alive count for the target's team
@@ -293,7 +394,8 @@ function App() {
                 }
 
                 // Mark that a soldier from target's team has died
-                defeatedTeams[target.team] = (defeatedTeams[target.team] || 0) + 1;
+                defeatedTeams[target.team] =
+                  (defeatedTeams[target.team] || 0) + 1;
               }
             }
           }
@@ -315,10 +417,11 @@ function App() {
 
       // After mapping, decrease morale of soldiers in teams that had soldiers die
       Object.keys(defeatedTeams).forEach((team) => {
-        const moraleDecrease = 10 * defeatedTeams[team] / (soldiers.length / 20); // Adjust as needed
+        const moraleDecrease =
+          (10 * Math.pow(defeatedTeams[team], 4)) / (soldiers.length / 10); // Adjust as needed
         updatedSoldiers = updatedSoldiers.map((s) => {
           if (s.team === team && s.alive && s.state !== 'retreating') {
-            s.morale -= moraleDecrease ;
+            s.morale -= moraleDecrease;
             if (s.morale <= 0 && s.state !== 'retreating') {
               s.state = 'retreating';
               setMessages((msgs) => [
@@ -374,23 +477,48 @@ function App() {
     });
     return collisions;
   };
+
   return (
-    <div className="flex flex-col min-h-screen bg-gray-900">
+    <div
+      className="flex flex-col min-h-screen bg-gray-900"
+      onClick={() => {
+        if (showHint) setShowHint(false);
+      }}
+    >
       {/* Battlefield */}
       <div
         ref={battlefieldRef}
+        onMouseDown={handleMouseDown} // Handle mouse down
+        onMouseUp={handleMouseUp} // Handle mouse up
+        onMouseMove={handleMouseMove} // Handle mouse move
+        onMouseLeave={handleMouseLeave} // Handle mouse leave
         className="relative w-full p-4 bg-gradient-to-b from-gray-800 to-gray-900 overflow-hidden flex-grow"
       >
         <div
-          className="relative battlefield bg-cover bg-center h-full"
+          className="relative battlefield bg-cover bg-center h-full rounded-lg shadow-lg"
           style={{
-            backgroundImage: "url('/images/battlefield.jpg')",
+            backgroundImage:
+              "url('https://i.pinimg.com/originals/7c/ca/0a/7cca0a0f83174b9e3ccaf43ec09558cc.jpg')",
           }}
         >
+          {/* Hint Overlay */}
+          {showHint && !battleStarted && (
+            <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 z-10">
+              <div className="text-center">
+                <h2 className="text-3xl font-bold text-white mb-4 animate-pulse">
+                  Click and drag to place soldiers
+                </h2>
+                <p className="text-lg text-gray-200">
+                  Select an army below and draw formations on the battlefield
+                </p>
+              </div>
+            </div>
+          )}
+
           {/* HUD UI Overlay */}
-          <div className="absolute top-0 left-0 w-full flex flex-col md:flex-row justify-between p-4 space-y-4 md:space-y-0">
+          <div className="absolute top-0 left-0 w-full flex flex-col md:flex-row justify-between p-4 space-y-4 md:space-y-0 z-20">
             {/* Army 1 HUD */}
-            <div className="flex items-center space-x-2 bg-blue-900 bg-opacity-50 p-2 rounded">
+            <div className="flex items-center space-x-2 bg-blue-900 bg-opacity-70 p-2 rounded">
               <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
               <div>
                 <p className="text-blue-300 font-semibold text-sm">Army 1</p>
@@ -401,7 +529,7 @@ function App() {
               </div>
             </div>
             {/* Army 2 HUD */}
-            <div className="flex items-center space-x-2 bg-red-900 bg-opacity-50 p-2 rounded">
+            <div className="flex items-center space-x-2 bg-red-900 bg-opacity-70 p-2 rounded">
               <div className="w-3 h-3 bg-red-500 rounded-full"></div>
               <div>
                 <p className="text-red-300 font-semibold text-sm">Army 2</p>
@@ -417,8 +545,8 @@ function App() {
             <Soldier key={soldier.id} soldier={soldier} />
           ))}
           {winner && (
-            <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-75">
-              <h1 className="text-4xl font-bold text-white">
+            <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-75 z-30">
+              <h1 className="text-5xl font-bold text-white">
                 {winner.toUpperCase()} WINS!
               </h1>
             </div>
@@ -430,7 +558,7 @@ function App() {
         {/* Messages */}
         <div className="mb-4">
           <h2 className="text-2xl font-semibold mb-2 text-white">Messages</h2>
-          <div className="max-h-32 md:max-h-48 overflow-y-auto border border-gray-700 p-2 bg-gray-700 text-white">
+          <div className="max-h-32 md:max-h-48 overflow-y-auto border border-gray-700 p-2 bg-gray-700 text-white rounded">
             {messages.map((msg, index) => (
               <p key={index} className="text-sm">
                 {msg}
@@ -461,7 +589,7 @@ function App() {
                           [stat]: parseFloat(e.target.value),
                         })
                       }
-                      className="w-full mt-1 p-2 border rounded text-sm bg-gray-700 border-gray-600 text-white"
+                      className="w-full mt-1 p-2 border rounded text-sm bg-gray-700 border-gray-600 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
                       min="0.1"
                       step="0.1"
                     />
@@ -491,7 +619,7 @@ function App() {
                           [stat]: parseFloat(e.target.value),
                         })
                       }
-                      className="w-full mt-1 p-2 border rounded text-sm bg-gray-700 border-gray-600 text-white"
+                      className="w-full mt-1 p-2 border rounded text-sm bg-gray-700 border-gray-600 text-white focus:outline-none focus:ring-2 focus:ring-red-500"
                       min="0.1"
                       step="0.1"
                     />
@@ -499,6 +627,29 @@ function App() {
                 ))}
             </div>
           </div>
+        </div>
+        {/* Army Selection Buttons */}
+        <div className="flex flex-col md:flex-row justify-center mt-6 space-y-2 md:space-y-0 md:space-x-4">
+          <button
+            onClick={() => setCurrentArmy('army1')}
+            className={`px-4 py-2 rounded w-full md:w-auto font-semibold transition ${
+              currentArmy === 'army1'
+                ? 'bg-blue-600 text-white'
+                : 'bg-gray-600 text-white hover:bg-blue-500'
+            }`}
+          >
+            Select Army 1
+          </button>
+          <button
+            onClick={() => setCurrentArmy('army2')}
+            className={`px-4 py-2 rounded w-full md:w-auto font-semibold transition ${
+              currentArmy === 'army2'
+                ? 'bg-red-600 text-white'
+                : 'bg-gray-600 text-white hover:bg-red-500'
+            }`}
+          >
+            Select Army 2
+          </button>
         </div>
         {/* Control Buttons */}
         <div className="flex flex-col md:flex-row justify-center mt-6 space-y-2 md:space-y-0 md:space-x-4">
