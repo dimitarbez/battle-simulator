@@ -1,0 +1,34 @@
+.soldier {
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    background-size: cover;
+    transition: transform 0.1s linear;
+  }
+  
+  .soldier.army1 {
+    background-image: url('https://i.imgur.com/0ZfN6hX.png');
+  }
+  
+  .soldier.army2 {
+    background-image: url('https://i.imgur.com/MHv0d3Y.png');
+  }
+  
+  .soldier.dead {
+    opacity: 0.5;
+  }
+  
+  .health-bar {
+    position: absolute;
+    top: -5px;
+    left: 0;
+    width: 100%;
+    height: 5px;
+    background-color: red;
+  }
+  
+  .health {
+    height: 100%;
+    background-color: green;
+  }
+  
