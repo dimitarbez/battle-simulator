@@ -1,15 +1,15 @@
 {
   "files": {
-    "main.css": "/battle-simulator/static/css/main.5f4855a5.css",
+    "main.css": "/battle-simulator/static/css/main.9ec1916f.css",
     "main.js": "/battle-simulator/static/js/main.65a72ddb.js",
     "static/js/453.22a2bbc8.chunk.js": "/battle-simulator/static/js/453.22a2bbc8.chunk.js",
     "index.html": "/battle-simulator/index.html",
-    "main.5f4855a5.css.map": "/battle-simulator/static/css/main.5f4855a5.css.map",
+    "main.9ec1916f.css.map": "/battle-simulator/static/css/main.9ec1916f.css.map",
     "main.65a72ddb.js.map": "/battle-simulator/static/js/main.65a72ddb.js.map",
     "453.22a2bbc8.chunk.js.map": "/battle-simulator/static/js/453.22a2bbc8.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.5f4855a5.css",
+    "static/css/main.9ec1916f.css",
     "static/js/main.65a72ddb.js"
   ]
 }
