@@ -15,7 +15,7 @@ Make sure you have the following tools installed on your machine:
 
 1. **Clone the Repository**:
     ```bash
-    git clone https://github.com/your-username/battle-simulator-game.git
+    git clone https://github.com/dimitarbez/battle-simulator-game.git
     cd battle-simulator-game
     ```
 
