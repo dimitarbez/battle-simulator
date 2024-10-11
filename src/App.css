@@ -1,38 +1,53 @@
-.App {
-  text-align: center;
-}
-
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
-}
-
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
+.app {
+  font-family: Arial, sans-serif;
   display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
 }
 
-.App-link {
-  color: #61dafb;
+.controls {
+  width: 250px;
+  padding: 20px;
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+.army-stats {
+  display: flex;
+  justify-content: space-between;
+}
+
+label {
+  display: block;
+  margin: 5px 0;
+}
+
+input {
+  width: 100%;
+}
+
+button {
+  margin: 10px 5px 0 0;
+  padding: 10px 15px;
+}
+
+.battlefield {
+  position: relative;
+  width: 800px;
+  height: 400px;
+  background-image: url('https://i.imgur.com/dZl4zvG.png');
+  background-size: cover;
+  border: 2px solid #000;
+  margin-left: 20px;
+}
+
+.winner-banner {
+  position: absolute;
+  top: 40%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: rgba(255, 215, 0, 0.9);
+  padding: 20px;
+  border-radius: 10px;
+}
+
+.winner-banner h1 {
+  margin: 0;
+  font-size: 48px;
 }
