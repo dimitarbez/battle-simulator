@@ -1,15 +1,15 @@
 {
   "files": {
-    "main.css": "/static/css/main.c4c10fe0.css",
-    "main.js": "/static/js/main.eba9c95d.js",
-    "static/js/453.22a2bbc8.chunk.js": "/static/js/453.22a2bbc8.chunk.js",
-    "index.html": "/index.html",
-    "main.c4c10fe0.css.map": "/static/css/main.c4c10fe0.css.map",
-    "main.eba9c95d.js.map": "/static/js/main.eba9c95d.js.map",
-    "453.22a2bbc8.chunk.js.map": "/static/js/453.22a2bbc8.chunk.js.map"
+    "main.css": "/battlesim.online/static/css/main.c4c10fe0.css",
+    "main.js": "/battlesim.online/static/js/main.9ab916e7.js",
+    "static/js/453.22a2bbc8.chunk.js": "/battlesim.online/static/js/453.22a2bbc8.chunk.js",
+    "index.html": "/battlesim.online/index.html",
+    "main.c4c10fe0.css.map": "/battlesim.online/static/css/main.c4c10fe0.css.map",
+    "main.9ab916e7.js.map": "/battlesim.online/static/js/main.9ab916e7.js.map",
+    "453.22a2bbc8.chunk.js.map": "/battlesim.online/static/js/453.22a2bbc8.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.c4c10fe0.css",
-    "static/js/main.eba9c95d.js"
+    "static/js/main.9ab916e7.js"
   ]
 }
