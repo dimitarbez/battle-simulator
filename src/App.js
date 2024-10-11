@@ -11,7 +11,7 @@ function App() {
     speed: 1.0,
     morale: 100,
     aliveCount: 0,
-    kills: 0
+    kills: 0,
   });
 
   const [army2Stats, setArmy2Stats] = useState({
@@ -20,7 +20,7 @@ function App() {
     speed: 1.0,
     morale: 100,
     aliveCount: 0,
-    kills: 0
+    kills: 0,
   });
 
   const [soldiers, setSoldiers] = useState([]);
@@ -72,6 +72,14 @@ function App() {
     };
   }, []);
 
+  // Helper to convert touch coordinates to battlefield coordinates
+  const getTouchPosition = (e) => {
+    const rect = battlefieldRef.current.getBoundingClientRect();
+    const x = e.touches[0].clientX - rect.left;
+    const y = e.touches[0].clientY - rect.top;
+    return { x, y };
+  };
+
   // Handle mouse down event to start drawing
   const handleMouseDown = (e) => {
     if (battleStarted) return; // Don't handle during battle
@@ -90,8 +98,29 @@ function App() {
     setLastSoldierPosition({ x, y });
   };
 
+  // Handle touch start event for mobile
+  const handleTouchStart = (e) => {
+    if (battleStarted) return;
+    e.preventDefault(); // Prevent scrolling
+
+    setIsDrawing(true);
+
+    // Hide the hint when the user starts interacting
+    if (showHint) setShowHint(false);
+
+    const { x, y } = getTouchPosition(e);
+    handleBattlefieldClick(x, y);
+    setLastSoldierPosition({ x, y });
+  };
+
   // Handle mouse up event to stop drawing
   const handleMouseUp = () => {
+    setIsDrawing(false);
+    setLastSoldierPosition(null);
+  };
+
+  // Handle touch end event to stop drawing
+  const handleTouchEnd = () => {
     setIsDrawing(false);
     setLastSoldierPosition(null);
   };
@@ -103,6 +132,19 @@ function App() {
     const x = e.clientX - rect.left;
     const y = e.clientY - rect.top;
 
+    handleDrawing(x, y);
+  };
+
+  // Handle touch move event for mobile
+  const handleTouchMove = (e) => {
+    if (!isDrawing) return;
+    e.preventDefault(); // Prevent scrolling
+    const { x, y } = getTouchPosition(e);
+    handleDrawing(x, y);
+  };
+
+  // Helper function to handle drawing for both mouse and touch
+  const handleDrawing = (x, y) => {
     if (lastSoldierPosition) {
       const dx = x - lastSoldierPosition.x;
       const dy = y - lastSoldierPosition.y;
@@ -118,14 +160,6 @@ function App() {
 
     // Update lastSoldierPosition
     setLastSoldierPosition({ x, y });
-  };
-
-  // Handle mouse leaving the battlefield while drawing
-  const handleMouseLeave = () => {
-    if (isDrawing) {
-      setIsDrawing(false);
-      setLastSoldierPosition(null);
-    }
   };
 
   // Function to handle adding soldiers at specific coordinates
@@ -154,7 +188,7 @@ function App() {
       color: currentArmy === 'army1' ? 'blue-500' : 'red-500',
       alive: true,
       state: 'idle',
-      radius: 10
+      radius: 10,
     };
 
     setSoldiers((prevSoldiers) => [...prevSoldiers, newSoldier]);
@@ -174,12 +208,12 @@ function App() {
     setArmy1Stats((prev) => ({
       ...prev,
       aliveCount: soldiers.filter((s) => s.team === 'army1').length,
-      kills: 0
+      kills: 0,
     }));
     setArmy2Stats((prev) => ({
       ...prev,
       aliveCount: soldiers.filter((s) => s.team === 'army2').length,
-      kills: 0
+      kills: 0,
     }));
 
     // Helper function to apply random variance within ±5%
@@ -203,7 +237,7 @@ function App() {
         maxMorale: armyStats.morale,
         alive: true,
         state: 'idle',
-        lastAttack: null
+        lastAttack: null,
       };
     });
 
@@ -222,12 +256,12 @@ function App() {
     setArmy1Stats((prev) => ({
       ...prev,
       aliveCount: 0,
-      kills: 0
+      kills: 0,
     }));
     setArmy2Stats((prev) => ({
       ...prev,
       aliveCount: 0,
-      kills: 0
+      kills: 0,
     }));
   };
 
@@ -287,12 +321,12 @@ function App() {
             if (soldier.team === 'army1') {
               setArmy1Stats((prev) => ({
                 ...prev,
-                aliveCount: prev.aliveCount - 1
+                aliveCount: prev.aliveCount - 1,
               }));
             } else {
               setArmy2Stats((prev) => ({
                 ...prev,
-                aliveCount: prev.aliveCount - 1
+                aliveCount: prev.aliveCount - 1,
               }));
             }
           }
@@ -351,12 +385,12 @@ function App() {
                 if (soldier.team === 'army1') {
                   setArmy1Stats((prev) => ({
                     ...prev,
-                    kills: prev.kills + 1
+                    kills: prev.kills + 1,
                   }));
                 } else {
                   setArmy2Stats((prev) => ({
                     ...prev,
-                    kills: prev.kills + 1
+                    kills: prev.kills + 1,
                   }));
                 }
 
@@ -364,12 +398,12 @@ function App() {
                 if (target.team === 'army1') {
                   setArmy1Stats((prev) => ({
                     ...prev,
-                    aliveCount: prev.aliveCount - 1
+                    aliveCount: prev.aliveCount - 1,
                   }));
                 } else {
                   setArmy2Stats((prev) => ({
                     ...prev,
-                    aliveCount: prev.aliveCount - 1
+                    aliveCount: prev.aliveCount - 1,
                   }));
                 }
 
@@ -466,13 +500,15 @@ function App() {
         onMouseDown={handleMouseDown} // Handle mouse down
         onMouseUp={handleMouseUp} // Handle mouse up
         onMouseMove={handleMouseMove} // Handle mouse move
-        onMouseLeave={handleMouseLeave} // Handle mouse leave
-        className="relative w-full p-4 bg-gradient-to-b from-gray-800 to-gray-900 overflow-hidden flex-grow"
+        onTouchStart={handleTouchStart} // Handle touch start
+        onTouchMove={handleTouchMove} // Handle touch move
+        onTouchEnd={handleTouchEnd} // Handle touch end
+        className="relative w-full p-4 bg-gradient-to-b from-gray-800 to-gray-900 overflow-hidden flex-grow noscroll"
       >
         <div
           className="relative battlefield bg-cover bg-center h-full rounded-lg shadow-lg"
           style={{
-            backgroundImage: "url('https://i.pinimg.com/originals/7c/ca/0a/7cca0a0f83174b9e3ccaf43ec09558cc.jpg')"
+            backgroundImage: "url('https://i.pinimg.com/originals/7c/ca/0a/7cca0a0f83174b9e3ccaf43ec09558cc.jpg')",
           }}
         >
           {/* Hint Overlay */}
@@ -579,7 +615,7 @@ function App() {
                       onChange={(e) =>
                         setArmy1Stats({
                           ...army1Stats,
-                          [stat]: parseFloat(e.target.value)
+                          [stat]: parseFloat(e.target.value),
                         })
                       }
                       className="w-full mt-1 p-2 border rounded text-sm bg-gray-700 border-gray-600 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -605,7 +641,7 @@ function App() {
                       onChange={(e) =>
                         setArmy2Stats({
                           ...army2Stats,
-                          [stat]: parseFloat(e.target.value)
+                          [stat]: parseFloat(e.target.value),
                         })
                       }
                       className="w-full mt-1 p-2 border rounded text-sm bg-gray-700 border-gray-600 text-white focus:outline-none focus:ring-2 focus:ring-red-500"

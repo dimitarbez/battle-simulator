@@ -5,12 +5,26 @@
 @tailwind components;
 @tailwind utilities;
 
+
+html, body {
+  overscroll-behavior: none;
+}
+
+
 /* Custom Animations */
 .prevent-select {
   -webkit-user-select: none; /* Safari */
   -ms-user-select: none; /* IE 10 and IE 11 */
   user-select: none; /* Standard syntax */
 }
+
+.noscroll {
+  overflow: hidden; /* Disable scrollbars */
+  touch-action: none; /* Disable touch scroll on mobile */
+  -ms-touch-action: none; /* For older IE/Edge versions */
+}
+
+
 
 /* Attack Animation */
 @keyframes swing {
