@@ -55,7 +55,9 @@ const Battlefield = ({
         className="relative battlefield bg-cover bg-center h-full rounded-none lg:rounded-lg shadow-2xl border-0 lg:border-2 lg:border-gray-600 overflow-hidden"
         style={{
           backgroundImage: "url('https://i.pinimg.com/originals/7c/ca/0a/7cca0a0f83174b9e3ccaf43ec09558cc.jpg')",
-          backgroundBlendMode: 'overlay',
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          backgroundRepeat: 'no-repeat',
           height: '100%', // Force exact height to container
           maxHeight: '100%', // Prevent overflow
         }}
@@ -74,8 +76,8 @@ const Battlefield = ({
           />
         )}
 
-        {/* Dark overlay for better contrast */}
-        <div className="absolute inset-0 bg-black/20"></div>
+        {/* Dark overlay for better contrast - reduced opacity */}
+        <div className="absolute inset-0 bg-black/10"></div>
 
         {/* Hint Overlay */}
         {showHint && (

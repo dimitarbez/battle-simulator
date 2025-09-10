@@ -379,7 +379,7 @@ body {
   height: 100% !important; /* Force exact height */
   max-height: 100% !important; /* Prevent overflow */
   min-height: 100% !important; /* Ensure full height */
-  background-color: #f0f0f0;
+  background-color: transparent; /* Remove white background */
   touch-action: manipulation; /* Better touch handling */
   transform: translateZ(0); /* Force hardware acceleration */
   backface-visibility: hidden; /* Optimize rendering */
