@@ -117,19 +117,16 @@ const Battlefield = ({
           ))}
         </div>
 
-        {/* Winner Overlay */}
+        {/* Winner Overlay - Simplified */}
         {winner && (
-          <div className="absolute inset-0 flex items-center justify-center bg-black/80 z-30 backdrop-blur-sm">
+          <div className="absolute inset-0 flex items-center justify-center bg-black/20 z-30 backdrop-blur-sm pointer-events-none">
             <div className="text-center animate-pulse">
-              <div className="text-8xl mb-4">
+              <div className="text-6xl mb-2 animate-bounce">
                 {winner === 'army1' ? '🔵' : '🔴'}
               </div>
-              <h1 className="text-4xl lg:text-6xl font-bold text-white mb-4 animate-bounce">
+              <h1 className="text-2xl lg:text-4xl font-bold text-white mb-2">
                 {winner.toUpperCase()} WINS!
               </h1>
-              <div className="text-lg lg:text-xl text-gray-300">
-                🏆 Victory Achieved!
-              </div>
             </div>
           </div>
         )}

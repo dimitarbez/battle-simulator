@@ -5,6 +5,7 @@ import { useBattlefield, useArmyStats, useBattleSimulation } from './hooks';
 import Battlefield from './components/Battlefield';
 import BattlefieldControls from './components/BattlefieldControls';
 import ArmyStatsPanel from './components/ArmyStatsPanel';
+import BattleResultsPanel from './components/BattleResultsPanel';
 // import NotificationSystem from './components/NotificationSystem';
 import HelpButton from './components/HelpButton';
 import { applyVariance, createSoldier, isWithinBounds } from './utils/battleUtils';
@@ -13,6 +14,8 @@ import './index.css';
 function App() {
   const [soldiers, setSoldiers] = useState([]);
   const [battleStarted, setBattleStarted] = useState(false);
+  const [initialArmy1Count, setInitialArmy1Count] = useState(0);
+  const [initialArmy2Count, setInitialArmy2Count] = useState(0);
 
   // Custom hooks
   const armyStats = useArmyStats();
@@ -90,6 +93,10 @@ function App() {
       return;
     }
 
+    // Store initial counts for battle results
+    setInitialArmy1Count(army1Count);
+    setInitialArmy2Count(army2Count);
+
     console.log(`Battle Started! ${army1Count} vs ${army2Count} soldiers`);
     // addNotification({
     //   type: 'success',
@@ -133,6 +140,8 @@ function App() {
   const resetSimulation = () => {
     setBattleStarted(false);
     setSoldiers([]);
+    setInitialArmy1Count(0);
+    setInitialArmy2Count(0);
     simulation.resetSimulation();
     armyStats.resetArmyStats();
     
@@ -240,7 +249,7 @@ function App() {
 
         {/* Controls Sidebar */}
         <aside className="w-full lg:w-80 xl:w-96 order-2 lg:order-2 bg-gray-800/90 backdrop-blur-sm border-l border-gray-700 lg:min-h-0">
-          <div className="p-4 h-full max-h-[50vh] lg:max-h-none overflow-y-auto sidebar-scroll">
+          <div className="p-4 h-full max-h-[35vh] lg:max-h-none overflow-y-auto sidebar-scroll">
             <BattlefieldControls
               currentArmy={battlefield.currentArmy}
               setCurrentArmy={battlefield.setCurrentArmy}
@@ -271,6 +280,19 @@ function App() {
 
       {/* Help Button */}
       <HelpButton />
+
+      {/* Battle Results Panel */}
+      {simulation.winner && (
+        <BattleResultsPanel
+          winner={simulation.winner}
+          army1Stats={armyStats.army1Stats}
+          army2Stats={armyStats.army2Stats}
+          initialArmy1Count={initialArmy1Count}
+          initialArmy2Count={initialArmy2Count}
+          battleDuration={simulation.battleDuration || 0}
+          onReset={resetSimulation}
+        />
+      )}
       </div>
     </HelmetProvider>
   );

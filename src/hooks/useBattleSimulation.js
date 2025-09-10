@@ -12,6 +12,9 @@ export const useBattleSimulation = (
   const [winner, setWinner] = useState(null);
   const [messages, setMessages] = useState([]);
   const [celebrationTimer, setCelebrationTimer] = useState(null);
+  const [battleStartTime, setBattleStartTime] = useState(null);
+  const [battleDuration, setBattleDuration] = useState(0);
+  const [showResults, setShowResults] = useState(false);
 
   const findClosestEnemy = (soldier, enemies) => {
     let minDistance = Infinity;
@@ -44,6 +47,11 @@ export const useBattleSimulation = (
   useEffect(() => {
     let animationFrameId;
 
+    // Track battle start time
+    if (battleStarted && !battleStartTime) {
+      setBattleStartTime(Date.now());
+    }
+
     const updateSimulation = () => {
       let defeatedTeams = {};
       let battleEnded = false;
@@ -60,6 +68,11 @@ export const useBattleSimulation = (
         if (activeEnemies.length === 0 && !winner) {
           setWinner(soldier.team);
           setMessages((msgs) => [...msgs, `${soldier.team} wins! Celebrating...`]);
+          
+          // Calculate battle duration
+          if (battleStartTime) {
+            setBattleDuration(Math.floor((Date.now() - battleStartTime) / 1000));
+          }
 
           battleEnded = true;
           winningTeam = soldier.team;
@@ -68,7 +81,8 @@ export const useBattleSimulation = (
             setTimeout(() => {
               setBattleStarted(false);
               setMessages((msgs) => [...msgs, `Game over. ${soldier.team} wins!`]);
-            }, 5000)
+              setShowResults(true); // Show results after celebration
+            }, 2000)
           );
 
           return soldier;
@@ -196,17 +210,22 @@ export const useBattleSimulation = (
         clearTimeout(celebrationTimer);
       }
     };
-  }, [battleStarted, winner, soldiers, battlefieldWidth, armyStats, setSoldiers, celebrationTimer, setBattleStarted]);
+  }, [battleStarted, winner, soldiers, battlefieldWidth, armyStats, setSoldiers, celebrationTimer, setBattleStarted, battleStartTime]);
 
   const resetSimulation = () => {
     setWinner(null);
     setMessages([]);
     setCelebrationTimer(null);
+    setBattleStartTime(null);
+    setBattleDuration(0);
+    setShowResults(false);
   };
 
   return {
     winner,
     messages,
+    battleDuration,
+    showResults,
     setMessages,
     resetSimulation,
   };
