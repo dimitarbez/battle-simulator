@@ -5,11 +5,27 @@
 @tailwind components;
 @tailwind utilities;
 
-
 html, body {
   overscroll-behavior: none;
+  -webkit-tap-highlight-color: transparent;
 }
 
+/* Smooth scrolling and better touch behavior */
+* {
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+input, textarea, button {
+  -webkit-user-select: auto;
+  -moz-user-select: auto;
+  -ms-user-select: auto;
+  user-select: auto;
+}
 
 /* Custom Animations */
 .prevent-select {
@@ -24,7 +40,86 @@ html, body {
   -ms-touch-action: none; /* For older IE/Edge versions */
 }
 
+/* Custom scrollbar for webkit browsers */
+::-webkit-scrollbar {
+  width: 8px;
+}
 
+::-webkit-scrollbar-track {
+  background: #374151;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #6B7280;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #9CA3AF;
+}
+
+/* Better scrollbar for sidebar */
+.sidebar-scroll::-webkit-scrollbar {
+  width: 6px;
+}
+
+.sidebar-scroll::-webkit-scrollbar-track {
+  background: rgba(55, 65, 81, 0.3);
+  border-radius: 3px;
+}
+
+.sidebar-scroll::-webkit-scrollbar-thumb {
+  background: rgba(107, 114, 128, 0.6);
+  border-radius: 3px;
+}
+
+.sidebar-scroll::-webkit-scrollbar-thumb:hover {
+  background: rgba(156, 163, 175, 0.8);
+}
+
+/* Custom range slider styles */
+input[type="range"] {
+  -webkit-appearance: none;
+  appearance: none;
+  background: transparent;
+  cursor: pointer;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  height: 20px;
+  width: 20px;
+  border-radius: 50%;
+  background: currentColor;
+  border: 2px solid #fff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+input[type="range"]::-webkit-slider-thumb:hover {
+  transform: scale(1.1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+}
+
+input[type="range"]::-moz-range-thumb {
+  height: 20px;
+  width: 20px;
+  border-radius: 50%;
+  background: currentColor;
+  border: 2px solid #fff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  cursor: pointer;
+  border: none;
+  transition: all 0.2s ease;
+}
+
+input[type="range"]::-moz-range-thumb:hover {
+  transform: scale(1.1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+}
 
 /* Attack Animation */
 @keyframes swing {
@@ -49,6 +144,20 @@ html, body {
   animation: swing 0.5s ease-in-out infinite;
   /* Add glow border */
   box-shadow: 0 0 8px rgba(255, 215, 0, 0.8);
+}
+
+/* Pulse animation for active elements */
+@keyframes gentle-pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.8;
+  }
+}
+
+.animate-gentle-pulse {
+  animation: gentle-pulse 2s ease-in-out infinite;
 }
 
 /* Retreat Animation */
@@ -116,24 +225,116 @@ html, body {
   animation: fade-out 1s forwards;
 }
 
+/* Slide in animations for mobile */
+@keyframes slideInLeft {
+  from {
+    transform: translateX(-100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slideInRight {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-slide-in-left {
+  animation: slideInLeft 0.3s ease-out;
+}
+
+.animate-slide-in-right {
+  animation: slideInRight 0.3s ease-out;
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.2s ease-out;
+}
+
 /* Battlefield Styling */
 .battlefield {
   position: relative;
   width: 100%;
-  height: 75vh; /* Adjust as needed */
+  min-height: 60vh; /* Minimum height for mobile */
   background-color: #f0f0f0;
+  touch-action: manipulation; /* Better touch handling */
 }
 
-/* For desktop screens, increase the height to 80% of the viewport height */
-@media (min-width: 1024px) {
+/* For tablet screens */
+@media (min-width: 768px) {
   .battlefield {
-    height: 80vh; /* 80% of the viewport height for desktop screens */
+    min-height: 70vh;
   }
 }
 
-/* Soldier Styling */
-.soldier {
-  position: absolute;
+/* For desktop screens, increase the height */
+@media (min-width: 1024px) {
+  .battlefield {
+    min-height: 80vh;
+  }
+}
+
+/* Better mobile touch targets */
+@media (max-width: 768px) {
+  button {
+    min-height: 44px; /* Minimum touch target size */
+    font-size: 16px; /* Prevent zoom on iOS */
+  }
+  
+  input {
+    font-size: 16px; /* Prevent zoom on iOS */
+  }
+
+  /* Optimize for smaller screens */
+  .soldier {
+    transform: translateZ(0);
+    will-change: transform;
+  }
+}
+
+/* Button hover states with better mobile support */
+@media (hover: hover) and (pointer: fine) {
+  button:hover {
+    transform: translateY(-1px);
+  }
+}
+
+/* Focus states for accessibility */
+button:focus-visible,
+input:focus-visible {
+  outline: 2px solid #3B82F6;
+  outline-offset: 2px;
+}
+
+/* Loading spinner */
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-spin {
+  animation: spin 1s linear infinite;
 }
 
 /* Body Styles */
@@ -144,4 +345,73 @@ body {
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  background-color: #111827; /* Ensure consistent dark background */
+}
+
+/* Glass effect utility */
+.glass-effect {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Gradient text utility */
+.gradient-text {
+  background: linear-gradient(45deg, #3B82F6, #EF4444);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Performance optimizations for mobile */
+.soldier {
+  position: absolute;
+  z-index: 10;
+  transition: all 0.1s ease-out;
+  will-change: transform; /* Optimize for animations */
+  transform-origin: center;
+}
+
+/* Hardware acceleration for better mobile performance */
+.battlefield {
+  position: relative;
+  width: 100%;
+  height: 100% !important; /* Force exact height */
+  max-height: 100% !important; /* Prevent overflow */
+  min-height: 100% !important; /* Ensure full height */
+  background-color: #f0f0f0;
+  touch-action: manipulation; /* Better touch handling */
+  transform: translateZ(0); /* Force hardware acceleration */
+  backface-visibility: hidden; /* Optimize rendering */
+}
+
+/* Remove responsive height changes since we want fixed height */
+@media (min-width: 768px) {
+  .battlefield {
+    height: 100% !important;
+    max-height: 100% !important;
+  }
+}
+
+/* For desktop screens */
+@media (min-width: 1024px) {
+  .battlefield {
+    height: 100% !important;
+    max-height: 100% !important;
+  }
+}
+
+/* Glass effect utility */
+.glass-effect {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Gradient text utility */
+.gradient-text {
+  background: linear-gradient(45deg, #3B82F6, #EF4444);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
