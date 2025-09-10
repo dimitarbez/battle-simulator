@@ -10,7 +10,7 @@ const useNotifications = () => {
     const newNotification = {
       id,
       type: 'info',
-      duration: 4000,
+      duration: 2000,
       ...notification,
     };
 
