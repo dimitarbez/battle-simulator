@@ -1,3 +1,11 @@
+# Battle Simulator - Robots.txt
 # https://www.robotstxt.org/robotstxt.html
+
 User-agent: *
-Disallow:
+Allow: /
+
+# Sitemap location
+Sitemap: https://battlesim.online/sitemap.xml
+
+# Crawl-delay (optional, helps with server load)
+Crawl-delay: 1
