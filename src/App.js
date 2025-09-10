@@ -1,4 +1,5 @@
 import React, { useState, useCallback, useEffect } from 'react';
+import { HelmetProvider, Helmet } from 'react-helmet-async';
 import { useBattlefield, useArmyStats, useBattleSimulation } from './hooks';
 // import useNotifications from './hooks/useNotifications';
 import Battlefield from './components/Battlefield';
@@ -154,12 +155,34 @@ function App() {
   };
 
   return (
-    <div
-      className="flex flex-col h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 prevent-select overflow-hidden"
-      onClick={() => {
-        if (battlefield.showHint) battlefield.setShowHint(false);
-      }}
-    >
+    <HelmetProvider>
+      <Helmet>
+        <title>
+          {battleStarted
+            ? `Battle in Progress - Battle Simulator`
+            : simulation.winner
+            ? `${simulation.winner} Wins! - Battle Simulator`
+            : 'Battle Simulator - Real-Time Strategy Army Combat Game'}
+        </title>
+        <meta 
+          name="description" 
+          content={
+            simulation.winner
+              ? `Victory achieved! ${simulation.winner} emerges triumphant in this epic battle simulation.`
+              : battleStarted
+              ? 'Epic battle in progress! Watch armies clash in real-time strategic combat.'
+              : 'Command armies in epic real-time battles! Deploy troops, customize stats, and watch strategic combat unfold in this free browser-based strategy game.'
+          }
+        />
+        <meta name="robots" content="index, follow" />
+        <link rel="canonical" href="https://battlesim.online" />
+      </Helmet>
+      <div
+        className="flex flex-col h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 prevent-select overflow-hidden"
+        onClick={() => {
+          if (battlefield.showHint) battlefield.setShowHint(false);
+        }}
+      >
       {/* Header */}
       <header className="bg-gray-800/50 backdrop-blur-sm border-b border-gray-700 px-4 py-3 flex-shrink-0">
         <div className="w-full flex items-center justify-between relative">
@@ -248,7 +271,8 @@ function App() {
 
       {/* Help Button */}
       <HelpButton />
-    </div>
+      </div>
+    </HelmetProvider>
   );
 }
 
