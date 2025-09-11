@@ -4,7 +4,7 @@ Welcome to **Battle Simulator** - an interactive, real-time strategy game where 
 
 🎮 **[Play Live Demo](https://battlesim.online)** | 📱 **Mobile Optimized** | 🌟 **Open Source**
 
-![Battle Simulator Screenshot](https://via.placeholder.com/800x400/1f2937/ffffff?text=Battle+Simulator+Screenshot)
+![Battle Simulator Screenshot](https://battlesim.online/screenshot.png)
 
 ## ✨ What Makes This Special
 
