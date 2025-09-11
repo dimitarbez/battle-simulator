@@ -308,7 +308,7 @@ battle-simulator/
 
 ## 📄 License
 
-This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) file for details.
+This project is licensed under the **GPLv3 License** - see the [LICENSE](LICENSE) file for details.
 
 **TL;DR**: Feel free to use, modify, and distribute this code. Just give credit where it's due! 😊
 
